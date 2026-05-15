@@ -442,15 +442,15 @@ const POOL_FALSCH = [
   "🌪️ Fast perfekt, {N}! Ein bisschen Feintuning und diese Aufgaben sind Geschichte!",
 ];
 
-// lastIdx pro UB, getrennt für richtig/falsch
-// Schlüssel: "b-u-ok" oder "b-u-err"
-const lastMeldungIdx = {};
+// Session-weit genutzte Indizes — nie denselben Satz zweimal zeigen
+const usedMeldungIdx = { ok: new Set(), err: new Set() };
 
-function zufallMeldung(pool, key) {
+function zufallMeldung(pool, type) {
+  const used = usedMeldungIdx[type];
+  if (used.size >= pool.length) used.clear();
   let idx;
-  const last = lastMeldungIdx[key] ?? -1;
-  do { idx = Math.floor(Math.random() * pool.length); } while (idx === last && pool.length > 1);
-  lastMeldungIdx[key] = idx;
+  do { idx = Math.floor(Math.random() * pool.length); } while (used.has(idx));
+  used.add(idx);
   return pool[idx].replace(/\{N\}/g, NAME);
 }
 function startMitName() {
@@ -616,7 +616,7 @@ function pruefen(b, u) {
     ubStatus[b][u] = true;
     hinweis.classList.remove('sichtbar');
 
-    const text = zufallMeldung(POOL_RICHTIG, `${b}-${u}-ok`);
+    const text = zufallMeldung(POOL_RICHTIG, 'ok');
     const emo  = text.match(/^\S+/)[0];
     const rest = text.slice(emo.length).trim();
     meldungEl.className = 'meldung ok-msg sichtbar';
@@ -653,7 +653,7 @@ function pruefen(b, u) {
     // Noch Fehler
     hinweis.classList.add('sichtbar');
 
-    const text = zufallMeldung(POOL_FALSCH, `${b}-${u}-err`);
+    const text = zufallMeldung(POOL_FALSCH, 'err');
     const emo  = text.match(/^\S+/)[0];
     const rest = text.slice(emo.length).trim();
     meldungEl.className = 'meldung err-msg sichtbar';
