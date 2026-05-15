@@ -384,9 +384,12 @@ function genData() {
   ]);
 
   DATA[0] = [];
+  const usedPlus = new Set();
   for (let i = 0; i < 30; i++) {
-    let a, b, c;
-    do { a = rnd(11, 59); b = rnd(11, 49); c = a + b; } while (c > 99 || c < 20);
+    let a, b, c, key;
+    do { a = rnd(11, 59); b = rnd(11, 49); c = a + b; key = `${a}+${b}`; }
+    while (c > 99 || c < 20 || usedPlus.has(key));
+    usedPlus.add(key);
     DATA[0].push({ typ: typen[i], a, b, c, op: '+' });
   }
 
@@ -397,9 +400,12 @@ function genData() {
   ]);
 
   DATA[1] = [];
+  const usedMinus = new Set();
   for (let i = 0; i < 30; i++) {
-    let a, b, c;
-    do { a = rnd(40, 99); b = rnd(11, 49); c = a - b; } while (c < 10);
+    let a, b, c, key;
+    do { a = rnd(40, 99); b = rnd(11, 49); c = a - b; key = `${a}-${b}`; }
+    while (c < 10 || usedMinus.has(key));
+    usedMinus.add(key);
     DATA[1].push({ typ: typen2[i], a, b, c, op: '−' });
   }
 }
