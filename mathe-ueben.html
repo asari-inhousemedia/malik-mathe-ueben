@@ -572,7 +572,16 @@ function pruefen(b, u) {
     if (inp.readOnly) { richtig++; continue; } // bereits korrekt gesperrt
 
     const val = inp.value.trim();
-    if (val === '') { offen++; continue; }
+    if (val === '') {
+      inp.classList.remove('korr');
+      inp.classList.add('err');
+      div.classList.add('err');
+      div.classList.remove('ok');
+      ic.textContent = '✘';
+      falsch++;
+      ersterVersuch[b][u] = false;
+      continue;
+    }
 
     const korrekt = parseInt(val) === getErg(DATA[b][i]);
     inp.classList.remove('korr');
