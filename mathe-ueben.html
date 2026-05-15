@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malik übt Mathe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    background: linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  h1 { text-align: center; font-size: 2.2rem; color: #4a148c; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: #777; font-size: 1rem; margin-bottom: 32px; }
+
+  /* BLOCK */
+  .block {
+    max-width: 700px;
+    margin: 0 auto 36px;
+    background: white;
+    border-radius: 22px;
+    padding: 24px 28px 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 0.35s;
+  }
+  .block.aktiv    { opacity: 1; pointer-events: all; }
+  .block.erledigt { opacity: 1; pointer-events: all; }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .block-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #6a1b9a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .block-badge {
+    font-size: 0.85rem;
+    background: #ede7f6;
+    color: #6a1b9a;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-weight: normal;
+  }
+
+  .mini-score { font-size: 0.95rem; display: flex; gap: 14px; }
+  .mini-score span { font-weight: bold; }
+  .mini-score .r { color: #2e7d32; }
+  .mini-score .f { color: #c62828; }
+
+  /* TIMER */
+  .timer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    background: #f3e5f5;
+    border-radius: 14px;
+    padding: 10px 16px;
+  }
+
+  .timer-display {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #4a148c;
+    letter-spacing: 2px;
+    min-width: 70px;
+  }
+  .timer-display.läuft  { color: #2e7d32; }
+  .timer-display.fertig { color: #555; }
+
+  .btn-timer {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 11px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .btn-timer:active { transform: scale(0.95); }
+  .btn-timer.start { background: #43a047; color: white; }
+  .btn-timer.stop  { background: #e53935; color: white; }
+
+  .timer-label { font-size: 0.9rem; color: #888; margin-left: 4px; }
+  .timer-done  { font-size: 0.9rem; color: #2e7d32; font-weight: bold; display: none; }
+
+  /* AUFGABEN */
+  .aufgaben-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .aufgabe {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.35rem;
+    background: #f7f3ff;
+    border-radius: 14px;
+    border: 3px solid transparent;
+    padding: 10px 14px;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+
+  .aufgabe.ok  {
+    background: #e8f5e9;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.25);
+  }
+  .aufgabe.err {
+    background: #ffebee;
+    border-color: #c62828;
+    box-shadow: 0 0 0 3px rgba(198,40,40,0.25);
+  }
+
+  .gleichung {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .aufgabe input {
+    width: 58px;
+    font-size: 1.2rem;
+    font-family: inherit;
+    border: 2px solid #ce93d8;
+    border-radius: 8px;
+    padding: 2px 4px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -moz-appearance: textfield;
+  }
+  .aufgabe input::-webkit-inner-spin-button,
+  .aufgabe input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .aufgabe input:focus { border-color: #7b1fa2; }
+  .aufgabe input.ok    { border-color: #43a047; background: #f1f8e9; }
+  .aufgabe input.err   { border-color: #e53935; background: #fff3f3; }
+  .aufgabe input.korr  { border-color: #1565c0; background: #e3f2fd; }
+
+  .icon { font-size: 1.2rem; min-width: 24px; text-align: right; }
+
+  /* UNTERBLOCK */
+  .unterblock {
+    border-top: 2px dashed #e0e0e0;
+    padding-top: 16px;
+    margin-top: 16px;
+    opacity: 0.35;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .unterblock:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .unterblock.aktiv { opacity: 1; pointer-events: all; }
+
+  .ub-label {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 8px;
+  }
+
+  /* MELDUNGS-BOX */
+  .meldung {
+    display: none;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    margin-top: 12px;
+    text-align: center;
+    animation: hüpf 0.4s ease;
+  }
+  .meldung.sichtbar { display: block; }
+  .meldung.ok-msg  { background: linear-gradient(135deg, #fffde7, #fff9c4); border: 2px solid #f9a825; color: #4e342e; }
+  .meldung.err-msg { background: #e8f5e9; border: 2px solid #66bb6a; color: #1b5e20; }
+  .meldung .big { font-size: 2rem; display: block; margin-bottom: 4px; }
+
+  /* Erfolgsmeldung Block-Abschluss (alter Stil, für Kompatibilität) */
+  .erfolg-box {
+    display: none;
+    background: linear-gradient(135deg, #fffde7, #fff9c4);
+    border: 2px solid #f9a825;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    color: #4e342e;
+    margin-bottom: 14px;
+    animation: hüpf 0.4s ease;
+    text-align: center;
+  }
+  .erfolg-box.sichtbar { display: block; }
+  .erfolg-box .big { font-size: 2rem; display: block; margin-bottom: 4px; }
+
+  @keyframes hüpf {
+    0%   { transform: scale(0.7); opacity: 0; }
+    70%  { transform: scale(1.06); }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+
+  /* Hinweis */
+  .hinweis {
+    display: none;
+    background: #fff3e0;
+    border-left: 4px solid #ef6c00;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    color: #5d4037;
+    margin-bottom: 10px;
+  }
+  .hinweis.sichtbar { display: block; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+
+  button {
+    font-family: inherit;
+    font-size: 1rem;
+    border: none;
+    border-radius: 13px;
+    padding: 10px 26px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.1s;
+  }
+  button:active { transform: scale(0.96); }
+
+  .btn-check  { background: #7b1fa2; color: white; box-shadow: 0 3px 10px rgba(123,31,162,0.3); }
+  .btn-weiter { background: #2e7d32; color: white; box-shadow: 0 3px 10px rgba(46,125,50,0.3); display: none; }
+  .btn-fertig { background: #1565c0; color: white; box-shadow: 0 3px 10px rgba(21,101,192,0.3); display: none; }
+
+  /* Abschluss */
+  .abschluss {
+    display: none;
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 22px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    animation: hüpf 0.5s ease;
+  }
+  .abschluss .emoji { font-size: 3.5rem; }
+  .abschluss h2 { font-size: 1.8rem; color: #4a148c; margin: 12px 0 8px; }
+  .abschluss p  { font-size: 1.1rem; color: #555; }
+  .abschluss .gesamt { font-size: 1.3rem; font-weight: bold; color: #6a1b9a; margin-top: 14px; }
+
+  .btn-neustart {
+    margin-top: 20px;
+    background: #7b1fa2;
+    color: white;
+    font-family: inherit;
+    font-size: 1.05rem;
+    border: none;
+    border-radius: 13px;
+    padding: 11px 30px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="feuerwerk-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+
+<!-- START-SCREEN -->
+<div id="start-screen" style="
+  position:fixed;inset:0;background:linear-gradient(135deg,#e0f7fa,#f3e5f5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:8888;padding:24px;text-align:center;">
+  <div style="font-size:3rem;margin-bottom:12px;">✏️</div>
+  <h2 style="font-size:1.8rem;color:#4a148c;margin-bottom:8px;">Mathe üben</h2>
+  <p style="color:#777;margin-bottom:28px;font-size:1rem;">Gib deinen Namen ein und leg los!</p>
+  <input id="name-input" type="text" placeholder="Dein Name …" autocomplete="off"
+    style="font-family:inherit;font-size:1.4rem;border:3px solid #ce93d8;border-radius:14px;
+           padding:10px 20px;text-align:center;outline:none;width:100%;max-width:320px;
+           margin-bottom:18px;color:#333;">
+  <button onclick="startMitName()"
+    style="font-family:inherit;font-size:1.1rem;font-weight:bold;background:#7b1fa2;
+           color:white;border:none;border-radius:14px;padding:13px 36px;cursor:pointer;
+           box-shadow:0 4px 14px rgba(123,31,162,0.35);">
+    Los geht's!
+  </button>
+</div>
+
+<h1 id="haupt-titel">✏️ Mathe üben</h1>
+<p class="subtitle">2 Blöcke — Plus und Minus mit Lückenaufgaben</p>
+
+<!-- BLOCK 0: ADDITION -->
+<div class="block aktiv" id="block-0">
+  <div class="block-header">
+    <div class="block-title">➕ Block 1 — Addition</div>
+    <div class="mini-score" id="score-0" style="display:none">
+      <span class="r">✔ <span id="r0">0</span></span>
+      <span class="f">✘ <span id="f0">0</span></span>
+    </div>
+  </div>
+  <div class="timer-row">
+    <span>⏱</span>
+    <span class="timer-display" id="time-0">00:00</span>
+    <button class="btn-timer start" id="tbtn-0" onclick="timerToggle(0)">Start</button>
+    <span class="timer-label" id="tlabel-0">Drück Start, wenn du loslegst!</span>
+    <span class="timer-done"  id="tdone-0"></span>
+  </div>
+  <!-- Unterblöcke werden per JS eingefügt -->
+  <div id="weiter-wrap-0" style="margin-top:16px;display:none;">
+    <button class="btn-weiter" id="weiter-0" onclick="zeigeBlock(1)" style="display:inline-block;">Weiter zu Block 2 →</button>
+  </div>
+</div>
+
+<!-- BLOCK 1: SUBTRAKTION -->
+<div class="block" id="block-1">
+  <div class="block-header">
+    <div class="block-title">➖ Block 2 — Subtraktion</div>
+    <div class="mini-score" id="score-1" style="display:none">
+      <span class="r">✔ <span id="r1">0</span></span>
+      <span class="f">✘ <span id="f1">0</span></span>
+    </div>
+  </div>
+  <div class="timer-row">
+    <span>⏱</span>
+    <span class="timer-display" id="time-1">00:00</span>
+    <button class="btn-timer start" id="tbtn-1" onclick="timerToggle(1)">Start</button>
+    <span class="timer-label" id="tlabel-1">Drück Start, wenn du loslegst!</span>
+    <span class="timer-done"  id="tdone-1"></span>
+  </div>
+  <!-- Unterblöcke werden per JS eingefügt -->
+  <div id="weiter-wrap-1" style="margin-top:16px;display:none;">
+    <button class="btn-fertig" id="fertig-1" onclick="zeigAbschluss()" style="display:inline-block;">Fertig! Ergebnis ansehen 🏁</button>
+  </div>
+</div>
+
+<!-- ABSCHLUSS -->
+<div class="abschluss" id="abschluss">
+  <div class="emoji" id="abs-emoji"></div>
+  <h2 id="abs-titel"></h2>
+  <p id="abs-text"></p>
+  <div class="gesamt" id="abs-gesamt"></div>
+  <br>
+  <button class="btn-neustart" onclick="neustart()">Nochmal von vorne</button>
+</div>
+
+<script>
+// ─── DATEN ───────────────────────────────────────────────────────────────────
+
+const DATA = [[], []];
+
+function rnd(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function genData() {
+  const typen = shuffle([
+    'n','n','n','n','n','n','n','n','n','n','n','n',
+    'l1','l1','l1','l1','l1','l1','l1','l1','l1',
+    'l2','l2','l2','l2','l2','l2','l2','l2','l2',
+  ]);
+
+  DATA[0] = [];
+  for (let i = 0; i < 30; i++) {
+    let a, b, c;
+    do { a = rnd(11, 59); b = rnd(11, 49); c = a + b; } while (c > 99 || c < 20);
+    DATA[0].push({ typ: typen[i], a, b, c, op: '+' });
+  }
+
+  const typen2 = shuffle([
+    'n','n','n','n','n','n','n','n','n','n','n','n',
+    'l1','l1','l1','l1','l1','l1','l1','l1','l1',
+    'l2','l2','l2','l2','l2','l2','l2','l2','l2',
+  ]);
+
+  DATA[1] = [];
+  for (let i = 0; i < 30; i++) {
+    let a, b, c;
+    do { a = rnd(40, 99); b = rnd(11, 49); c = a - b; } while (c < 10);
+    DATA[1].push({ typ: typen2[i], a, b, c, op: '−' });
+  }
+}
+
+function getErg(a) {
+  if (a.typ === 'n')  return a.c;
+  if (a.typ === 'l1') return a.a;
+  if (a.typ === 'l2') return a.b;
+}
+
+function gleichungHtml(a, inputTag) {
+  if (a.typ === 'n')  return `${a.a} ${a.op} ${a.b} = ${inputTag}`;
+  if (a.typ === 'l1') return `${inputTag} ${a.op} ${a.b} = ${a.c}`;
+  if (a.typ === 'l2') return `${a.a} ${a.op} ${inputTag} = ${a.c}`;
+}
+
+// ─── MELDUNGS-POOLS ──────────────────────────────────────────────────────────
+
+let NAME = '';
+
+const POOL_RICHTIG = [
+  "🚀 BRUTAL! {N}, du bist eine Rakete — NASA hat gerade angerufen und will dich einstellen!",
+  "🤖 MASCHINE! Dein Gehirn rechnet schneller als jeder Computer — das ist nicht normal, {N}!",
+  "💥 BOOOM! Diese Aufgaben haben keine Chance gegen {N} gehabt. Null. Keine einzige!",
+  "🏆 Offiziell bestätigt: {N} ist das mathematische Wunderkind des Jahres. Vielleicht des Jahrhunderts!",
+  "🦁 {N} — DER KÖNIG DER ZAHLEN! Alle anderen Zahlen müssen sich jetzt bei dir entschuldigen!",
+  "🔥 KRASS, {N}! Du bist so gut, dass die Aufgaben beim nächsten Mal freiwillig aufgeben!",
+  "🎯 PERFEKT, {N}! Kein einziger Fehler. Das Universum verneigt sich gerade vor dir!",
+  "⚡ BLITZ-{N}! So schnell und so richtig — das ist eigentlich verboten!",
+];
+
+const POOL_FALSCH = [
+  "😤 Ey {N}, die Aufgaben dachten sie hätten gewonnen — FALSCH GEDACHT! Du korrigierst die jetzt!",
+  "🐢 Kurze Denkpause für dein Superhirn, {N}. Dann wieder angreifen — du packst das!",
+  "😂 Selbst Einstein hat manchmal daneben gehauen, {N}. Du bist also in guter Gesellschaft!",
+  "💪 Fast, {N}! Diese Zahlen sind trickreich — die tricksen sogar Lehrer. Nochmal drauf!",
+  "🦊 Die Aufgaben werden nervös, {N}! Sie wissen, dass du sie gleich hast!",
+  "🎮 Nochmal, {N}! In jedem guten Spiel braucht man manchmal einen zweiten Versuch!",
+  "😎 Fehler gefunden, {N}? Sehr gut — jetzt weißt du wo's hakt. Los, ausmerzen!",
+  "🌪️ Fast perfekt, {N}! Ein bisschen Feintuning und diese Aufgaben sind Geschichte!",
+];
+
+// lastIdx pro UB, getrennt für richtig/falsch
+// Schlüssel: "b-u-ok" oder "b-u-err"
+const lastMeldungIdx = {};
+
+function zufallMeldung(pool, key) {
+  let idx;
+  const last = lastMeldungIdx[key] ?? -1;
+  do { idx = Math.floor(Math.random() * pool.length); } while (idx === last && pool.length > 1);
+  lastMeldungIdx[key] = idx;
+  return pool[idx].replace(/\{N\}/g, NAME);
+}
+function startMitName() {
+  const input = document.getElementById('name-input');
+  const n = input.value.trim();
+  if (!n) { input.focus(); input.style.borderColor = '#e53935'; return; }
+  NAME = n;
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('haupt-titel').textContent = `${NAME} übt Mathe ✏️`;
+  genData();
+  bauBlock(0);
+  bauBlock(1);
+}
+
+// Enter im Namensfeld = Start
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('name-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startMitName();
+  });
+});
+
+// ─── BLOCK AUFBAUEN ──────────────────────────────────────────────────────────
+
+// gesamtScore[b] = richtige Aufgaben pro Block (aufsummiert über alle UBs)
+const gesamtScore = [0, 0];
+
+// ubStatus[b][u] = true wenn UB komplett richtig bestanden
+const ubStatus = [[false, false, false], [false, false, false]];
+
+// richtigeInUB[b][u] = Anzahl bereits korrekt bestätigter Felder
+const richtigeInUB = [[0,0,0],[0,0,0]];
+
+// ersterVersuch[b][u] = true solange noch kein Fehler gemacht wurde
+const ersterVersuch = [[true,true,true],[true,true,true]];
+
+function bauBlock(b) {
+  const blockEl = document.getElementById(`block-${b}`);
+  // Weiter-Wrap holen (schon im HTML)
+  const weiterWrap = document.getElementById(b === 0 ? 'weiter-wrap-0' : 'weiter-wrap-1');
+
+  for (let u = 0; u < 3; u++) {
+    const start = u * 10;
+    const end   = start + 10;
+
+    const ubDiv = document.createElement('div');
+    ubDiv.className = 'unterblock' + (u === 0 ? ' aktiv' : '');
+    ubDiv.id = `ub-${b}-${u}`;
+
+    const label = document.createElement('div');
+    label.className = 'ub-label';
+    label.textContent = `Teil ${u + 1}/3`;
+    ubDiv.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'aufgaben-grid';
+    grid.id = `grid-${b}-${u}`;
+    ubDiv.appendChild(grid);
+
+    // Aufgaben in Grid
+    for (let i = start; i < end; i++) {
+      const a = DATA[b][i];
+      const inputTag = `<input type="text" inputmode="numeric" id="inp-${b}-${i}" placeholder="?" autocomplete="off">`;
+      const div = document.createElement('div');
+      div.className = 'aufgabe';
+      div.id = `a-${b}-${i}`;
+      div.innerHTML = `<span class="gleichung">${gleichungHtml(a, inputTag)}</span><span class="icon" id="ic-${b}-${i}"></span>`;
+      grid.appendChild(div);
+
+      // Enter-Taste → nächstes Feld oder prüfen
+      setTimeout(() => {
+        const inpEl = document.getElementById(`inp-${b}-${i}`);
+        if (!inpEl) return;
+        inpEl.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            // nächstes nicht-readonly Feld im gleichen UB
+            const nextInUB = i + 1 < end ? document.getElementById(`inp-${b}-${i+1}`) : null;
+            if (nextInUB && !nextInUB.readOnly) { nextInUB.focus(); }
+            else { pruefen(b, u); }
+          }
+        });
+      }, 0);
+    }
+
+    const hinweis = document.createElement('div');
+    hinweis.className = 'hinweis';
+    hinweis.id = `hinweis-${b}-${u}`;
+    hinweis.textContent = 'Einige sind noch falsch. Schau nochmal hin!';
+    ubDiv.appendChild(hinweis);
+
+    const meldung = document.createElement('div');
+    meldung.className = 'meldung';
+    meldung.id = `meldung-${b}-${u}`;
+    ubDiv.appendChild(meldung);
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'btn-row';
+    btnRow.style.marginTop = '10px';
+    btnRow.innerHTML = `<button class="btn-check" id="check-${b}-${u}" onclick="pruefen(${b},${u})">Prüfen</button>`;
+    ubDiv.appendChild(btnRow);
+
+    // Vor dem weiter-wrap einfügen
+    blockEl.insertBefore(ubDiv, weiterWrap);
+  }
+}
+
+// ─── PRÜFEN ──────────────────────────────────────────────────────────────────
+
+function pruefen(b, u) {
+  const start = u * 10;
+  const end   = start + 10;
+
+  let richtig = 0, falsch = 0, offen = 0;
+
+  for (let i = start; i < end; i++) {
+    const inp = document.getElementById(`inp-${b}-${i}`);
+    const ic  = document.getElementById(`ic-${b}-${i}`);
+    const div = document.getElementById(`a-${b}-${i}`);
+
+    if (inp.readOnly) { richtig++; continue; } // bereits korrekt gesperrt
+
+    const val = inp.value.trim();
+    if (val === '') { offen++; continue; }
+
+    const korrekt = parseInt(val) === getErg(DATA[b][i]);
+    inp.classList.remove('korr');
+    inp.classList.toggle('ok',  korrekt);
+    inp.classList.toggle('err', !korrekt);
+    div.classList.toggle('ok',  korrekt);
+    div.classList.toggle('err', !korrekt);
+    ic.textContent = korrekt ? '✔' : '✘';
+
+    if (korrekt) {
+      richtig++;
+      inp.readOnly = true;
+    } else {
+      falsch++;
+      ersterVersuch[b][u] = false;
+    }
+  }
+
+  // Score-Anzeige im Block-Header
+  richtigeInUB[b][u] = richtig;
+  const gesamtRichtig = richtigeInUB[b].reduce((s,v) => s+v, 0);
+  document.getElementById(`r${b}`).textContent = gesamtRichtig;
+  document.getElementById(`f${b}`).textContent = (30 - gesamtRichtig);
+  document.getElementById(`score-${b}`).style.display = 'flex';
+
+  const meldungEl = document.getElementById(`meldung-${b}-${u}`);
+  const hinweis   = document.getElementById(`hinweis-${b}-${u}`);
+  const checkBtn  = document.getElementById(`check-${b}-${u}`);
+
+  if (falsch === 0 && offen === 0) {
+    // Alles richtig
+    ubStatus[b][u] = true;
+    hinweis.classList.remove('sichtbar');
+
+    const text = zufallMeldung(POOL_RICHTIG, `${b}-${u}-ok`);
+    const emo  = text.match(/^\S+/)[0];
+    const rest = text.slice(emo.length).trim();
+    meldungEl.className = 'meldung ok-msg sichtbar';
+    meldungEl.innerHTML = `<span class="big">${emo}</span>${rest}`;
+
+    if (ersterVersuch[b][u]) feuerwerk();
+
+    checkBtn.style.display = 'none';
+
+    // Kurz warten, dann nächsten UB freischalten oder Weiter-Button zeigen
+    setTimeout(() => {
+      if (u < 2) {
+        // Nächsten Unterblock aktivieren
+        const naechster = document.getElementById(`ub-${b}-${u+1}`);
+        naechster.classList.add('aktiv');
+        naechster.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Ersten freien Input fokussieren
+        setTimeout(() => {
+          const f = document.getElementById(`inp-${b}-${(u+1)*10}`);
+          if (f) f.focus();
+        }, 400);
+      } else {
+        // Letzter UB bestanden → Block erledigt, Weiter-Button zeigen
+        timerStop(b);
+        document.getElementById(`block-${b}`).classList.add('erledigt');
+        const wrap = document.getElementById(b === 0 ? 'weiter-wrap-0' : 'weiter-wrap-1');
+        wrap.style.display = 'block';
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        gesamtScore[b] = gesamtRichtig;
+      }
+    }, 800);
+
+  } else {
+    // Noch Fehler
+    hinweis.classList.add('sichtbar');
+
+    const text = zufallMeldung(POOL_FALSCH, `${b}-${u}-err`);
+    const emo  = text.match(/^\S+/)[0];
+    const rest = text.slice(emo.length).trim();
+    meldungEl.className = 'meldung err-msg sichtbar';
+    meldungEl.innerHTML = `<span class="big">${emo}</span>${rest}`;
+
+    // Falsche Felder leeren + blau markieren
+    for (let i = start; i < end; i++) {
+      const inp = document.getElementById(`inp-${b}-${i}`);
+      if (inp.classList.contains('err')) {
+        inp.value = '';
+        inp.classList.remove('err');
+        inp.classList.add('korr');
+        document.getElementById(`a-${b}-${i}`).classList.remove('err');
+        document.getElementById(`ic-${b}-${i}`).textContent = '';
+        inp.readOnly = false;
+      }
+    }
+
+    checkBtn.style.display = 'inline-block';
+
+    // Ersten freien Eintrag fokussieren
+    for (let i = start; i < end; i++) {
+      const inp = document.getElementById(`inp-${b}-${i}`);
+      if (!inp.readOnly) { inp.focus(); break; }
+    }
+  }
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+
+function zeigeBlock(b) {
+  const el = document.getElementById(`block-${b}`);
+  el.classList.add('aktiv');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => {
+    const f = document.getElementById(`inp-${b}-0`);
+    if (f) f.focus();
+  }, 400);
+}
+
+function zeigAbschluss() {
+  // gesamtScore für Block 1 sicherstellen
+  const b = 1;
+  const gesamtRichtig = richtigeInUB[b].reduce((s,v) => s+v, 0);
+  gesamtScore[b] = gesamtRichtig;
+
+  const box = document.getElementById('abschluss');
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth' });
+
+  const total   = 60;
+  const richtig = gesamtScore[0] + gesamtScore[1];
+  const pct     = Math.round(richtig / total * 100);
+
+  const [emo, titel, text] = pct === 100
+    ? ['🏆', `Perfekt, ${NAME}! Alle richtig!`,       `${NAME}, du hast ALLES richtig! Die Lehrerin fällt morgen vom Stuhl!`]
+    : pct >= 80
+    ? ['🌟', `Super gemacht, ${NAME}!`,               `Fast perfekt, ${NAME} — noch ein bisschen üben und du bist unschlagbar!`]
+    : pct >= 60
+    ? ['👍', `Gut, ${NAME}! Weiter so!`,              `Schon richtig gut, ${NAME}! Nochmal drüber und du hast es drauf!`]
+    : ['💪', `Weiter üben, ${NAME}!`,                 `Rom wurde auch nicht an einem Tag gebaut, ${NAME}. Morgen wieder!`];
+
+  document.getElementById('abs-emoji').textContent  = emo;
+  document.getElementById('abs-titel').textContent  = titel;
+  document.getElementById('abs-text').textContent   = text;
+  document.getElementById('abs-gesamt').textContent = `${richtig} von ${total} Aufgaben richtig — ${pct} %`;
+}
+
+function neustart() { location.reload(); }
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+
+const timerState = [
+  { laufend: false, sekunden: 0, interval: null },
+  { laufend: false, sekunden: 0, interval: null },
+];
+
+function timerToggle(b) {
+  const s = timerState[b];
+  if (!s.laufend) {
+    s.laufend = true;
+    const btn = document.getElementById(`tbtn-${b}`);
+    btn.textContent = 'Stop';
+    btn.classList.replace('start', 'stop');
+    document.getElementById(`tlabel-${b}`).textContent = 'Läuft …';
+    document.getElementById(`time-${b}`).classList.add('läuft');
+    s.interval = setInterval(() => {
+      s.sekunden++;
+      document.getElementById(`time-${b}`).textContent = fmt(s.sekunden);
+    }, 1000);
+  } else {
+    timerStop(b);
+  }
+}
+
+function timerStop(b) {
+  const s = timerState[b];
+  if (!s.laufend) return;
+  clearInterval(s.interval);
+  s.laufend = false;
+  const btn = document.getElementById(`tbtn-${b}`);
+  btn.textContent = 'Start';
+  btn.classList.replace('stop', 'start');
+  const anzeige = document.getElementById(`time-${b}`);
+  anzeige.classList.remove('läuft');
+  anzeige.classList.add('fertig');
+  document.getElementById(`tlabel-${b}`).textContent = 'Deine Zeit:';
+  const done = document.getElementById(`tdone-${b}`);
+  done.textContent   = `⏱ ${fmt(s.sekunden)}`;
+  done.style.display = 'inline';
+}
+
+function fmt(sek) {
+  return `${String(Math.floor(sek/60)).padStart(2,'0')}:${String(sek%60).padStart(2,'0')}`;
+}
+
+// ─── FEUERWERK ───────────────────────────────────────────────────────────────
+function feuerwerk() {
+  const canvas = document.getElementById('feuerwerk-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+
+  const FARBEN = ['#ff4081','#ffeb3b','#00e5ff','#69f0ae','#ff6d00','#e040fb','#ffffff'];
+  const partikel = [];
+
+  function explosion(x, y) {
+    const n = 80 + Math.floor(Math.random() * 40);
+    for (let i = 0; i < n; i++) {
+      const winkel = (Math.PI * 2 / n) * i + Math.random() * 0.3;
+      const kraft  = 3 + Math.random() * 6;
+      partikel.push({
+        x, y,
+        vx: Math.cos(winkel) * kraft,
+        vy: Math.sin(winkel) * kraft - 2,
+        alpha: 1,
+        radius: 3 + Math.random() * 3,
+        farbe: FARBEN[Math.floor(Math.random() * FARBEN.length)],
+        schwerkraft: 0.12 + Math.random() * 0.08,
+      });
+    }
+  }
+
+  // 5 zufällige Explosionen verteilt über die Zeit
+  const positionen = [
+    [0.25, 0.3], [0.75, 0.25], [0.5, 0.15],
+    [0.2, 0.5],  [0.8, 0.4],
+  ];
+  positionen.forEach(([rx, ry], idx) => {
+    setTimeout(() => explosion(
+      canvas.width  * rx + (Math.random() - 0.5) * 80,
+      canvas.height * ry + (Math.random() - 0.5) * 60,
+    ), idx * 350);
+  });
+
+  let frame = 0;
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let p of partikel) {
+      p.x     += p.vx;
+      p.y     += p.vy;
+      p.vy    += p.schwerkraft;
+      p.vx    *= 0.98;
+      p.alpha -= 0.014;
+      if (p.alpha <= 0) continue;
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle   = p.farbe;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    frame++;
+    if (frame < 180) requestAnimationFrame(tick);
+    else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+</script>
+</body>
+</html>
