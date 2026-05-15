@@ -468,37 +468,110 @@ function gleichungHtml(a, inputTag) {
 let NAME = '';
 
 const POOL_RICHTIG = [
-  "🚀 BRUTAL! {N}, du bist eine Rakete — NASA hat gerade angerufen und will dich einstellen!",
-  "🤖 MASCHINE! Dein Gehirn rechnet schneller als jeder Computer — das ist nicht normal, {N}!",
-  "💥 BOOOM! Diese Aufgaben haben keine Chance gegen {N} gehabt. Null. Keine einzige!",
-  "🏆 Offiziell bestätigt: {N} ist das mathematische Wunderkind des Jahres. Vielleicht des Jahrhunderts!",
-  "🦁 {N} — DER KÖNIG DER ZAHLEN! Alle anderen Zahlen müssen sich jetzt bei dir entschuldigen!",
-  "🔥 KRASS, {N}! Du bist so gut, dass die Aufgaben beim nächsten Mal freiwillig aufgeben!",
-  "🎯 PERFEKT, {N}! Kein einziger Fehler. Das Universum verneigt sich gerade vor dir!",
-  "⚡ BLITZ-{N}! So schnell und so richtig — das ist eigentlich verboten!",
+  "🚀 Start frei, {N}! Diese Zahlen sind direkt in die Richtig-Galaxie geflogen!",
+  "🎯 Volltreffer, {N}! Die Aufgaben machen gerade heimlich Applaus.",
+  "🏆 Alles richtig, {N}! Dein Bleistift braucht jetzt eine Sonnenbrille.",
+  "⚡ Zack, {N}! So schnell richtig, da wackelt der Radiergummi.",
+  "💫 Mega gerechnet, {N}! Die Zahlen tanzen schon Polonaise.",
+  "🥳 Null Fehler, {N}! Das ist Mathe-Konfetti im Kopf.",
+  "🎉 Sauber, {N}! Die Aufgaben haben gerade 'Wow!' geflüstert.",
+  "🧠 Superhirn an, Fehler aus! Stark gemacht, {N}.",
+  "🍕 Perfekt, {N}! Wenn Mathe Pizza wäre, hättest du das größte Stück.",
+  "🪄 Hokuspokus richtig, {N}! Jede Aufgabe sitzt.",
+  "🌟 Glitzerleistung, {N}! Deine Antworten strahlen bis zum Pausenhof.",
+  "🎮 Level geschafft, {N}! Alle Zahlen besiegt, Extrapunkte fürs Gehirn.",
+  "😎 Cool gerechnet, {N}! Sogar die Gleichzeichen nicken zufrieden.",
+  "🥁 Trommelwirbel, {N}! Kein Fehler zu sehen, nicht mal mit Lupe.",
+  "🛸 Mathe-UFO gelandet, {N}! Mission 'Alles richtig' erfüllt.",
+  "📣 Durchsage: {N} hat gerade richtig starke Mathe gemacht!",
+  "🧃 Trinkpause verdient, {N}! Deine Zahlen waren alle auf Kurs.",
+  "🎈 Alles richtig, {N}! Die Aufgaben schweben vor Freude.",
+  "🕺 Zahlen-Disco, {N}! Jede Antwort hat den richtigen Schritt gefunden.",
+  "⭐ Sternchenalarm, {N}! Das war richtig rund.",
+  "🍀 Glück? Nein, Können! Sehr stark, {N}.",
+  "🎁 Überraschung: Alle Antworten stimmen, {N}!",
+  "🧩 Passt perfekt, {N}! Jedes Zahlenstück sitzt an der richtigen Stelle.",
+  "🔥 Warmgerechnet und voll getroffen, {N}!",
+  "📚 Hausaufgaben-Highfive, {N}! Das war spitze.",
+  "🎵 Mathe-Melodie stimmt, {N}! Kein falscher Ton dabei.",
+  "🥇 Goldrunde, {N}! Diese Aufgaben kannst du abhaken.",
+  "🪩 Richtig-Party, {N}! Die Zahlen drehen sich vor Freude.",
+  "💎 Glasklar gelöst, {N}! Da gibt es nichts zu meckern.",
+  "🚦 Alles auf Grün, {N}! Weiterfahrt erlaubt.",
+  "🎲 Glückszahl? Alle Zahlen! Prima gemacht, {N}.",
+  "🧁 Sahnehaube drauf, {N}! Das war lecker richtig.",
+  "📌 Festgepinnt: {N} kann das richtig gut.",
+  "🧯 Kein Fehler-Alarm, {N}! Alles ruhig, alles richtig.",
+  "🎪 Manege frei, {N}! Deine Antworten haben eine perfekte Show gemacht.",
+  "🧊 Eiskalt gelöst, {N}! Die Aufgaben sind dahingeschmolzen.",
+  "💡 Lampen an, {N}! Dein Kopf hatte die besten Ideen.",
+  "🪁 Hoch hinaus, {N}! Alle Lösungen fliegen richtig.",
+  "🎺 Tadaa, {N}! Genau so geht's.",
+  "🧇 Knusprig gerechnet, {N}! Jede Antwort sitzt.",
 ];
 
 const POOL_FALSCH = [
-  "😤 Ey {N}, die Aufgaben dachten sie hätten gewonnen — FALSCH GEDACHT! Du korrigierst die jetzt!",
-  "🐢 Kurze Denkpause für dein Superhirn, {N}. Dann wieder angreifen — du packst das!",
-  "😂 Selbst Einstein hat manchmal daneben gehauen, {N}. Du bist also in guter Gesellschaft!",
-  "💪 Fast, {N}! Diese Zahlen sind trickreich — die tricksen sogar Lehrer. Nochmal drauf!",
-  "🦊 Die Aufgaben werden nervös, {N}! Sie wissen, dass du sie gleich hast!",
-  "🎮 Nochmal, {N}! In jedem guten Spiel braucht man manchmal einen zweiten Versuch!",
-  "😎 Fehler gefunden, {N}? Sehr gut — jetzt weißt du wo's hakt. Los, ausmerzen!",
-  "🌪️ Fast perfekt, {N}! Ein bisschen Feintuning und diese Aufgaben sind Geschichte!",
+  "🔎 Fast, {N}! Da haben sich ein paar Zahlen versteckt. Nochmal suchen!",
+  "🧠 Denkmütze kurz gerade rücken, {N}. Gleich klappt's besser.",
+  "🪄 Huch, ein Zahlen-Zaubertrick! {N}, probier die markierten Felder nochmal.",
+  "🎮 Zweiter Versuch, {N}! Das ist wie ein neues Level mit mehr Gehirn-Power.",
+  "🧃 Kurz schlürfen, tief durchatmen, weiterrechnen, {N}.",
+  "📌 Einige Antworten kleben noch am falschen Platz, {N}. Setz sie neu hin!",
+  "😄 Ups, die Zahlen haben Quatsch gemacht. {N}, du bringst sie wieder in Ordnung.",
+  "🧩 Fast fertig, {N}! Ein paar Teile passen noch nicht ganz.",
+  "🚦 Noch nicht alles grün, {N}. Schau dir die blauen Felder nochmal an.",
+  "🎯 Knapp daneben, {N}! Der nächste Schuss sitzt bestimmt besser.",
+  "🛠️ Kleine Mathe-Baustelle, {N}. Helm auf, Zahlen reparieren!",
+  "🍕 Da fehlt noch der richtige Belag, {N}. Rechne die Stücke nochmal.",
+  "🪁 Eine Antwort ist vom Weg abgekommen, {N}. Hol sie zurück!",
+  "💡 Fast erleuchtet, {N}! Noch ein bisschen nachdenken.",
+  "🥁 Trommelwirbel verschoben, {N}. Erst die Fehler weg, dann die Party.",
+  "🧽 Wegwischen und neu versuchen, {N}. Die richtigen Zahlen warten schon.",
+  "📚 Das ist Üben, {N}: Fehler finden, stärker werden, weiter geht's!",
+  "⚙️ Ein paar Zahnräder klemmen noch, {N}. Dreh sie nochmal richtig.",
+  "🎈 Fast oben, {N}! Noch ein paar Zahlen festknoten.",
+  "🧁 Der Mathe-Muffin ist fast fertig, {N}. Noch kurz die Zutaten prüfen.",
+  "🕵️ Detektiv {N}, hier sind noch ein paar Zahlen-Spuren zu prüfen.",
+  "🚀 Rakete fast startklar, {N}! Noch schnell die Rechenknöpfe checken.",
+  "🎪 Kleine Zahlen-Showpause, {N}. Danach klappt der Trick.",
+  "🪩 Die Zahlen tanzen noch durcheinander, {N}. Bring sie in die Reihe.",
+  "🧯 Kein Stress, {N}! Nur ein kleiner Fehler-Alarm zum Ausschalten.",
+  "📣 Ansage: {N} probiert es nochmal und macht die Zahlen ordentlich.",
+  "🎲 Nochmal würfeln im Kopf, {N}. Du bist nah dran.",
+  "🧊 Cool bleiben, {N}. Die blauen Felder sind deine nächste Mission.",
+  "💎 Da steckt schon viel Gutes drin, {N}. Jetzt noch den Rest polieren.",
+  "🎵 Ein paar Töne klingen schief, {N}. Rechne sie nochmal gerade.",
+  "⭐ Fast Sternchen, {N}! Noch kurz nachbessern.",
+  "🧇 Die Rechnung ist fast knusprig, {N}. Einmal wenden bitte.",
+  "🛸 Mathe-Funk meldet: Bitte die markierten Aufgaben nochmal prüfen, {N}.",
+  "🎁 Überraschung, {N}: Noch nicht fertig, aber gleich bestimmt!",
+  "🥳 Die Party wartet, {N}. Erst die kleinen Fehler einfangen.",
+  "📐 Lineal gerade, Kopf klar, {N}. Schau nochmal genau hin.",
+  "🔥 Du bist warm, {N}! Jetzt die letzten Fehler wegpusten.",
+  "🪀 Zurück und nochmal los, {N}. Diese Aufgaben schaffst du.",
+  "🧃 Mathe-Saft lädt nach, {N}. Danach nochmal die blauen Felder.",
+  "🏁 Ziel fast in Sicht, {N}! Noch ein paar Schritte rechnen.",
 ];
 
-// Session-weit genutzte Indizes — nie denselben Satz zweimal zeigen
-const usedMeldungIdx = { ok: new Set(), err: new Set() };
+// Session-weit genutzte Sätze: während dieser Seite kein gleicher Satz zweimal.
+const usedMeldungen = { ok: new Set(), err: new Set() };
+const extraMeldungNr = { ok: 1, err: 1 };
 
 function zufallMeldung(pool, type) {
-  const used = usedMeldungIdx[type];
-  if (used.size >= pool.length) used.clear();
-  let idx;
-  do { idx = Math.floor(Math.random() * pool.length); } while (used.has(idx));
-  used.add(idx);
-  return pool[idx].replace(/\{N\}/g, NAME);
+  const used = usedMeldungen[type];
+  const frei = pool.filter(satz => !used.has(satz));
+  if (frei.length > 0) {
+    const satz = frei[Math.floor(Math.random() * frei.length)];
+    used.add(satz);
+    return satz.replace(/\{N\}/g, NAME);
+  }
+
+  const nr = extraMeldungNr[type]++;
+  const fallback = type === 'ok'
+    ? `🎉 Extra-Richtig-Runde ${nr}, {N}! Wieder alles sauber gelöst.`
+    : `🔁 Extra-Denk-Runde ${nr}, {N}! Kurz prüfen, dann geht's weiter.`;
+  used.add(fallback);
+  return fallback.replace(/\{N\}/g, NAME);
 }
 function startMitName() {
   const input = document.getElementById('name-input');
