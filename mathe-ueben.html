@@ -273,6 +273,35 @@
   .abschluss p  { font-size: 1.1rem; color: #555; }
   .abschluss .gesamt { font-size: 1.3rem; font-weight: bold; color: #6a1b9a; margin-top: 14px; }
 
+  /* BLOCK-NAVIGATION */
+  .block-nav {
+    display: none;
+    max-width: 700px;
+    margin: 0 auto 28px;
+    gap: 12px;
+    justify-content: center;
+  }
+  .block-nav.sichtbar { display: flex; }
+
+  .btn-nav {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 2px solid #ce93d8;
+    background: white;
+    color: #6a1b9a;
+    border-radius: 13px;
+    padding: 9px 24px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .btn-nav:hover {
+    background: #f3e5f5;
+    border-color: #9c27b0;
+    box-shadow: 0 0 0 3px rgba(156,39,176,0.15);
+  }
+  .btn-nav:active { transform: scale(0.96); }
+
   .btn-neustart {
     margin-top: 20px;
     background: #7b1fa2;
@@ -313,6 +342,11 @@
 
 <h1 id="haupt-titel">✏️ Mathe üben</h1>
 <p class="subtitle">2 Blöcke — Plus und Minus mit Lückenaufgaben</p>
+
+<div class="block-nav" id="block-nav">
+  <button class="btn-nav" onclick="springZuBlock(0)">➕ Block 1 — Addition</button>
+  <button class="btn-nav" onclick="springZuBlock(1)">➖ Block 2 — Subtraktion</button>
+</div>
 
 <!-- BLOCK 0: ADDITION -->
 <div class="block aktiv" id="block-0">
@@ -473,6 +507,7 @@ function startMitName() {
   NAME = n;
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('haupt-titel').textContent = `${NAME} übt Mathe ✏️`;
+  document.getElementById('block-nav').classList.add('sichtbar');
   genData();
   bauBlock(0);
   bauBlock(1);
@@ -704,6 +739,17 @@ function zeigeBlock(b) {
     const f = document.getElementById(`inp-${b}-0`);
     if (f) f.focus();
   }, 400);
+}
+
+function springZuBlock(b) {
+  const el = document.getElementById(`block-${b}`);
+  el.classList.add('aktiv');
+  // Ersten noch offenen Unterblock aktivieren
+  for (let u = 0; u < 3; u++) {
+    const ub = document.getElementById(`ub-${b}-${u}`);
+    if (ub && !ubStatus[b][u]) { ub.classList.add('aktiv'); break; }
+  }
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function zeigAbschluss() {
