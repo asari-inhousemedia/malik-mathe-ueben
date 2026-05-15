@@ -191,7 +191,14 @@
     animation: hüpf 0.4s ease;
   }
   .meldung.sichtbar { display: block; }
-  .meldung.ok-msg  { background: linear-gradient(135deg, #fffde7, #fff9c4); border: 2px solid #f9a825; color: #4e342e; }
+  .meldung.ok-msg  {
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    border: 2px solid #9c27b0;
+    box-shadow: 0 0 0 4px rgba(156,39,176,0.18), 0 0 22px rgba(156,39,176,0.35);
+    color: #4a148c;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
   .meldung.err-msg { background: #e8f5e9; border: 2px solid #66bb6a; color: #1b5e20; }
   .meldung .big { font-size: 2rem; display: block; margin-bottom: 4px; }
 
@@ -632,14 +639,15 @@ function pruefen(b, u) {
 
     checkBtn.style.display = 'none';
 
-    // Kurz warten, dann nächsten UB freischalten oder Weiter-Button zeigen
+    // Meldung sichtbar scrollen (nicht zum nächsten Block)
+    meldungEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Nächsten UB freischalten oder Weiter-Button zeigen
     setTimeout(() => {
       if (u < 2) {
-        // Nächsten Unterblock aktivieren
         const naechster = document.getElementById(`ub-${b}-${u+1}`);
         naechster.classList.add('aktiv');
-        naechster.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Ersten freien Input fokussieren
+        // Kein Scroll — Nutzer liest Meldung, scrollt selbst weiter
         setTimeout(() => {
           const f = document.getElementById(`inp-${b}-${(u+1)*10}`);
           if (f) f.focus();
@@ -650,7 +658,6 @@ function pruefen(b, u) {
         document.getElementById(`block-${b}`).classList.add('erledigt');
         const wrap = document.getElementById(b === 0 ? 'weiter-wrap-0' : 'weiter-wrap-1');
         wrap.style.display = 'block';
-        wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
         gesamtScore[b] = gesamtRichtig;
       }
     }, 800);
