@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/", "destination": "/mathe-ueben.html" }]
+}
